@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Vulnerable Auction Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script>
+        // A7: Identification and Authentication Failures - Client-side authentication
+        function checkUserAccess() {
+            // Client-side authentication that can be bypassed
+            const isAdmin = localStorage.getItem('isAdmin');
+            if (isAdmin === 'true') {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        }
+
+        // Store user data in local storage (insecure)
+        function storeUserData(userData) {
+            localStorage.setItem('userData', JSON.stringify(userData));
+            if (userData.admin) {
+                localStorage.setItem('isAdmin', 'true');
+            }
+        }
+
+        // A3: Injection - DOM-based XSS
+        window.onload = function() {
+            // Get search parameter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const search = urlParams.get('search');
+            
+            // A3: DOM-based XSS - directly inserting user input into DOM
+            if (search) {
+                document.getElementById('searchResults').innerHTML = 
+                    '<h3>Search results for: ' + search + '</h3>';
+            }
+            
+            checkUserAccess();
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Premier Auctions</h1>
+        <nav>
+            <a href="/">Home</a>
+            <div class="auth-container" th:if="${user != null}">
+                <p>Welcome, <span th:text="${user.username}"></span>!</p>
+                <a href="/logout" class="btn btn-secondary">Logout</a>
+            </div>
+            <div th:if="${user == null}">
+                <a href="/login" class="btn btn-primary">Login</a>
+                <a href="/register" class="btn btn-secondary">Register</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="search-container">
+        <h2>Find Your Next Treasure</h2>
+        <!-- A3: Injection - Reflected XSS vulnerability -->
+        <form action="/" method="get" class="search-form">
+            <input type="text" name="search" placeholder="Search items..." class="search-input">
+            <button type="submit" class="btn btn-primary search-button">Search</button>
+        </form>
+        <div id="searchResults" class="search-results"></div>
+    </div>
+    
+    <div class="mb-5">
+        <h2>Featured Auctions</h2>
+        <div class="items-grid">
+            <div th:each="item : ${items}" class="item-card">
+                <!-- A3: Injection - Stored XSS vulnerability due to unescaped output -->
+                <div class="item-image"></div>
+                <div class="item-content">
+                    <h3 class="item-title" th:utext="${item.name}"></h3>
+                    <p class="item-description" th:utext="${item.description}"></p>
+                    <div class="item-meta">
+                        <div class="item-price">$<span th:text="${item.currentBid}"></span></div>
+                        <div class="item-seller">Seller: <span th:text="${item.seller?.username}"></span></div>
+                    </div>
+                    <a th:href="@{'/item/' + ${item.id}}" class="btn btn-primary mt-3">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- A1: Broken Access Control - Hidden admin panel -->
+    <div id="adminPanel" style="display: none;">
+        <h2>Admin Panel</h2>
+        <p>This panel should only be accessible to admins.</p>
+        <a href="/api/users/admin/all" class="btn btn-danger">View All Users</a>
+    </div>
+    
+    <script th:if="${user != null}">
+        // A2: Cryptographic Failures - Sensitive data in JavaScript
+        const userData = {
+            id: [[${user.id}]],
+            username: '[[${user.username}]]',
+            email: '[[${user.email}]]',
+            admin: [[${user.admin}]],
+            creditCard: '[[${user.creditCardNumber}]]'
+        };
+        storeUserData(userData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transfer Success</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Premier Auctions</h1>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h2>Transfer Complete</h2>
+        
+        <div class="alert alert-success mt-4">
+            <h3>Transaction Successful</h3>
+            <p th:text="${message}">Transfer details will appear here.</p>
+        </div>
+        
+        <div class="alert alert-danger mt-4">
+            <h3>⚠️ Security Notice</h3>
+            <p>If you arrived at this page via the "Cute Kittens" button, your money has been transferred
+            without your explicit consent - demonstrating a successful CSRF attack!</p>
+        </div>
+        
+        <div class="mt-4 mb-4">
+            <a th:href="@{/transfer-form}" class="btn btn-secondary">Back to Transfer Form</a>
+            <a th:href="@{/}" class="btn btn-primary ml-2">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

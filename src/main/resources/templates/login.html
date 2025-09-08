@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Vulnerable Auction Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Premier Auctions</h1>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2 class="text-center mb-4">Log into Your Account</h2>
+                
+                <div class="alert alert-danger" th:if="${param.error}">
+                    Invalid username or password
+                </div>
+                
+                <!-- A7: Identification and Authentication Failures - No CSRF protection -->
+                <form action="/login" method="post" class="mb-4">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+                
+                <p class="text-center">Don't have an account? <a href="/register">Register here</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- A3: Injection - HTML Injection vulnerability -->
+    <div class="alert alert-info mt-4">
+        <h3>Auction News</h3>
+        <p>Latest update: <span th:utext="${param.message}"></span></p>
+    </div>
+    
+    <script>
+        // A3: Injection - JavaScript injection vulnerability
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // A3: Potentially executing arbitrary JavaScript from URL parameter
+        var redirectUrl = getParameterByName('redirect');
+        if (redirectUrl) {
+            document.write('<div class="alert alert-warning">You will be redirected after login to: ' + redirectUrl + '</div>');
+        }
+    </script>
+</body>
+</html>

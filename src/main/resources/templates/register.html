@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register - Vulnerable Auction Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Premier Auctions</h1>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2 class="text-center mb-4">Create Your Account</h2>
+                
+                <!-- A7: Identification and Authentication Failures - No CSRF protection -->
+                <!-- A2: Cryptographic Failures - Sending sensitive data in clear text -->
+                <form action="/register" method="post" class="mb-4">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                        <!-- A7: Weak password policy, no client-side validation -->
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="creditCard">Credit Card Number:</label>
+                        <input type="text" id="creditCard" name="creditCard" placeholder="XXXX-XXXX-XXXX-XXXX" required>
+                        <!-- A2: Sensitive data in clear text -->
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </form>
+                
+                <p class="text-center">Already have an account? <a href="/login">Login here</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // A7: Weak authentication - Client-side only password validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long');
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
