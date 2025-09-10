@@ -1,0 +1,18 @@
+{
+  "workspace": {
+    "view": "instructions",
+    "files": [
+      "src/main.js",
+      "README.md"
+    ],
+    "terminals": [
+      {
+        "name": "Development",
+        "command": "npm install",
+        "cwd": "./",
+        "message": "Installing dependencies..."
+      }
+    ],
+    "browser": "<http://localhost:3000>"
+  }
+}
